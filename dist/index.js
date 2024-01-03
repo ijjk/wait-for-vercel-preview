@@ -21,6 +21,7 @@ const waitForUrl = async ({
   maxTimeout,
   checkIntervalInMilliseconds,
   vercelPassword,
+  vercelBypassToken,
   path,
 }) => {
   const iterations = calculateIterations(
@@ -43,6 +44,10 @@ const waitForUrl = async ({
         };
 
         core.setOutput('vercel_jwt', jwt);
+      }
+
+      if (vercelBypassToken) {
+        headers['x-vercel-protection-bypass'] = vercelBypassToken;
       }
 
       let checkUri = new URL(path, url);
@@ -234,15 +239,22 @@ const waitForDeploymentToStart = async ({
         return deployment;
       }
 
-      throw new Error(`no ${actorName} deployment found`);
+      console.log(
+        `Could not find any deployments for actor ${actorName},${
+          environment ? ` environment ${environment}` : ''
+        } retrying (attempt ${i + 1} / ${iterations})`
+      );
     } catch (e) {
       console.log(
-        `Could not find any deployments for actor ${actorName}, retrying (attempt ${
+        `Error while fetching deployments, retrying (attempt ${
           i + 1
         } / ${iterations})`
       );
-      await wait(checkIntervalInMilliseconds);
+
+      console.error(e);
     }
+
+    await wait(checkIntervalInMilliseconds);
   }
 
   return null;
@@ -279,6 +291,7 @@ const run = async () => {
     // Inputs
     const GITHUB_TOKEN = core.getInput('token', { required: true });
     const VERCEL_PASSWORD = core.getInput('vercel_password');
+    const VERCEL_BYPASS_TOKEN = core.getInput('vercel_bypass_token');
     const ENVIRONMENT = core.getInput('environment');
     const MAX_TIMEOUT = Number(core.getInput('max_timeout')) || 60;
     const ALLOW_INACTIVE = Boolean(core.getInput('allow_inactive')) || false;
@@ -326,7 +339,7 @@ const run = async () => {
       sha: sha,
       environment: ENVIRONMENT,
       actorName: 'vercel[bot]',
-      maxTimeout: MAX_TIMEOUT / 2,
+      maxTimeout: MAX_TIMEOUT,
       checkIntervalInMilliseconds: CHECK_INTERVAL_IN_MS,
     });
 
@@ -366,6 +379,7 @@ const run = async () => {
       maxTimeout: MAX_TIMEOUT,
       checkIntervalInMilliseconds: CHECK_INTERVAL_IN_MS,
       vercelPassword: VERCEL_PASSWORD,
+      vercelBypassToken: VERCEL_BYPASS_TOKEN,
       path: PATH,
     });
   } catch (error) {

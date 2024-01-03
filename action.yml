@@ -20,6 +20,9 @@ inputs:
     description: 'How often (in seconds) should we make the HTTP request checking to see if the deployment is available?'
     default: '2'
     required: false
+  vercel_bypass_token:
+    description: 'Vercel bypass token'
+    required: false
   vercel_password:
     description: 'Vercel password protection secret'
     required: false

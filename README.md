@@ -27,6 +27,10 @@ no new deployment is available. Defaults to `false`.
 
 Optional - How often (in seconds) should we make the HTTP request checking to see if the deployment is available? Defaults to `2` seconds.
 
+### `vercel_bypass_token`
+
+Optional - The [bypass token](https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation) for the deployment
+
 ### `vercel_password`
 
 Optional - The [password](https://vercel.com/docs/concepts/projects/overview#password-protection) for the deployment
