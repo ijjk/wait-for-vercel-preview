@@ -35,6 +35,7 @@ const waitForUrl = async ({
 
         headers = {
           Cookie: `_vercel_jwt=${jwt}`,
+          'User-Agent': '@ijjk/wait-for-vercel-preview',
         };
 
         core.setOutput('vercel_jwt', jwt);
